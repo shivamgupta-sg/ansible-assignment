@@ -1,0 +1,48 @@
+---
+- name: Remove older Docker installations
+  package: 
+    name:
+      - docker-ce
+    state: absent
+  become: yes
+
+- name: Deploy repository
+  block:
+    - name: Deploy repository
+      get_url:
+        url: "{{ docker_ce_repo_file_url }}"
+        dest: /etc/yum.repos.d/docker-ce.repo
+        owner: root
+        group: root
+        mode: 0644
+      become: yes
+  rescue:
+    - name: Install dnf-utils
+      package: 
+        name: dnf-plugins-core
+      become: yes
+    - name: Deploy repository
+      shell: "dnf config-manager --add-repo {{ docker_ce_repo_file_url }}"
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+      become: yes
+
+- name: Install docker-ce
+  package:
+    name: docker-ce
+    state: present
+  become: yes
+
+- name: Start Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Add user {{ USERNAME }} to docker group
+  user:
+    name: "{{ ansible_facts['USERNAME'] }}"
+    groups: docker
+    append: yes
+  become: yes

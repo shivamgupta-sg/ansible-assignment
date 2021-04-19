@@ -1,0 +1,11 @@
+- name: Playbook for installing java
+  hosts: aws
+  become: true
+
+  tasks:
+  - name: Install OpenJDK Java
+    apt:
+      name: default-jdk
+      update_cache: yes
+      install_recommends: yes
+

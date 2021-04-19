@@ -1,0 +1,28 @@
+---
+# tasks file for install_mysql
+
+- name: Install MariaDB
+  apt:
+    name:
+      - mariadb-server
+      - python3-mysqldb
+    state: latest
+    update_cache: yes
+  become: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Install MariaDB
+  package:
+    name:
+      - mariadb-server
+      - python3-PyMySQL
+    state: latest
+  become: yes
+  when: ansible_os_family == 'RedHat'
+
+- name: start and enable mariadb
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+  become: yes

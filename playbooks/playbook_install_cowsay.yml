@@ -1,0 +1,11 @@
+---
+- name: Playbook to install cowsay
+  hosts: aws
+  become: yes
+  gather_facts: false
+
+  tasks:
+  - name: Installing Cowsay
+    apt:
+      name: cowsay
+...

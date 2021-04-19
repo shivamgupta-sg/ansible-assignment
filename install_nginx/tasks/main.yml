@@ -1,0 +1,23 @@
+---
+# tasks file for install_nginx
+
+- name: Install nginx on Debian
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+  become: yes
+  when: ansible_os_family == "Debian"
+  notify:
+    - start nginx
+
+- name: Install nginx on RHEL
+  yum:
+    name: nginx
+    state: latest
+    update_cache: yes
+  become: yes
+  when: ansible_os_family == "RedHat"
+  notify:
+    - start nginx
+...

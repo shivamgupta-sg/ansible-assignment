@@ -1,0 +1,7 @@
+---
+# importing playbook for installing java
+- import_playbook: playbook_install_default_jdk.yml
+
+# importing playbook for installing cowsay
+- include: playbook_install_cowsay.yml
+...

@@ -1,0 +1,37 @@
+---
+- name: Remove older Docker installations
+  package: 
+    name:
+      - docker
+      - docker-common
+      - docker-engine
+    state: absent
+  become: yes
+
+- name: Deploy repository
+  block:
+    - name: Deploy repository
+      get_url:
+        url: "{{ docker_ce_repo_file_url }}"
+        dest: /etc/yum.repos.d/docker-ce.repo
+        owner: root
+        group: root
+        mode: 0644
+      become: yes
+  rescue:
+    - name: Install yum-utils
+      package: 
+        name: yum-utils
+      become: yes
+    - name: Deploy repository
+      shell: "yum-config-manager --add-repo {{ docker_ce_repo_file_url }}"
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+      become: yes
+
+- name: Install docker-ce
+  package:
+    name: docker-ce
+    state: present
+  become: yes
+  notify: restart Docker

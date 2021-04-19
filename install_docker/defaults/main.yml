@@ -1,0 +1,5 @@
+---
+# defaults file for install_docker
+
+docker_service_enabled: true
+...

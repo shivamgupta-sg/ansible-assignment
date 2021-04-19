@@ -1,0 +1,102 @@
+---
+# tasks file for install_docker
+
+- name: Include {{ ansible_distribution }} specific variables
+  include_vars: "ansible_distribution/{{ ansible_distribution.split(' ', 1)[0]|lower }}.yml"
+
+- name: Debug package manager
+  debug:
+    msg: "{{ ansible_pkg_mgr}}"
+
+- name: Start Installation
+  include_tasks: "{{ ansible_pkg_mgr }}.yml"
+
+- name: Ensure service starts at boot
+  service: 
+    name: docker 
+    enabled: "{{ docker_service_enabled }}"
+  become: yes
+
+- name: Ensure service started
+  service: 
+    name: docker 
+    state: started
+  become: yes
+
+
+
+
+
+
+
+
+
+
+
+
+
+# - name: Installing Docker on Debian
+#   block:
+#     # Update apt packages
+#     - name: Update apt packages
+#       apt:
+#         update_cache: yes
+#       when: ansible_os_family == 'Debian'
+
+#     # Install required packages
+#     - name: Install required packages
+#       package:
+#         name: {{ item }}
+#         state: present
+#       loop:
+#         - apt-transport-https
+#         - ca-certificates
+#         - curl
+#         - gnupg
+#         - lsb-release
+
+#     # Add Docker GPG apt key
+#     - name: Add Docker GPG apt key
+#       apt_key:
+#         url: "https://download.docker.com/linux/ubuntu/gpg"
+#         state: present
+#       when: ansible_os_family == 'Debian'
+
+#     # Add Docker Repo
+#     - name: Add Docker Repository
+#       apt_repository:
+#         repo: deb https://download.docker.com/linux/ubuntu bionic stable
+#         state: present
+#       when: ansible_os_family == 'Debian'
+
+#     # Update apt and Install Docker Engine
+#     - name: Update apt and install docker-ce
+#       apt: 
+#         update_cache: yes 
+#         name: docker-ce 
+#         state: latest
+#       notify:
+#       - start docker
+#   when: ansible_os_family == 'Debian'
+
+# - name: Installing Docker on RHEL
+#   block: 
+#     # Installing yum-utils
+#     - name: Install pre-requisite packages
+#       package:
+#         name: yum-utils
+#         state: latest
+
+#     # Add yum repository
+#     - name: Add Docker CE repo
+#       yum_repository:
+#         base_url: https://download.docker.com/linux/centos/docker-ce.repo
+#         dest: /etc/yum.repos.d/docker-ce.repo
+
+#     - name: Install Docker
+#       package: 
+#         name: docker 
+#         state: latest
+#       notify: start docker
+#   when: ansible_os_family == 'RedHat'
+...

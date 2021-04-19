@@ -1,0 +1,47 @@
+---
+- name: Remove old Docker version
+  apt:
+    name:
+      - docker
+      - docker-engine
+      - docker-io
+    state: absent
+  become: yes
+
+- name: Install Prerequisits for APT
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+  become: yes
+
+- name: Add repository key
+  block:
+    - name: Add Docker GPG Key
+      apt_key:
+        url: "{{ docker_ce_gpg_key }}"
+      become: yes
+  rescue:
+    - name: Ensure curl is present.
+      package: 
+        name: curl
+      become: yes
+    - name: Download GPG key.
+      shell: "curl -sSL {{ docker_ce_gpg_key }} | sudo apt-key add -"
+      become: yes
+
+- name: Configure Docker repository
+  apt_repository:
+    repo: "{{ docker_apt_repo_url }}"
+  become: yes
+
+- name: Install docker-ce
+  apt: 
+    name: docker-ce 
+    state: present
+  become: yes
+  notify: restart Docker
